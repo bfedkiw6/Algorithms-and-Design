@@ -60,17 +60,15 @@ size_t PQueue::Size() {
   return curr_size;
 }
 
+// From Professors Binary Heap Code
 T& PQueue::Top() {
-  if (curr_size == 0)
-    throw std::underflow_error("Empty priority queue!");
-  return items.front();
+  if (!Size())
+    throw std::underflow_error(
+        "Empty priority queue!");
+  return items[Root()];
 }
 
-void PQueue::Pop() {
-  if (curr_size == 0)
-    throw std::underflow_error("Empty priority queue!");
-  items.pop_front();
-}
+void PQueue::Pop();
 
 void PQueue::Push(const T &item);
 
