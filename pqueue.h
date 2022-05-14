@@ -49,19 +49,16 @@ size_t PQueue<typename T, typename C>::Size() {
   return cur_size;
 }
 
+// From Professors Binary Heap Code
 template <typename T, typename C>
 T& PQueue<typename T, typename C>::Top() {
-  if (cur_size == 0)
+  if (!cur_size)
     throw std::underflow_error("Empty priority queue!");
-  return items.front();
+  return items[0];
 }
 
 template <typename T, typename C>
-void PQueue<typename T, typename C>::Pop() {
-  if (cur_size == 0)
-    throw std::underflow_error("Empty priority queue!");
-  items.pop_front();
-}
+void PQueue<typename T, typename C>::Pop();
 
 template <typename T, typename C>
 void PQueue<typename T, typename C>::Push(const T& item) {}
