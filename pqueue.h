@@ -64,7 +64,12 @@ template <typename T, typename C>
 void PQueue<typename T, typename C>::Push(const T& item) {}
 
 template <typename T, typename C>
-void PQueue<typename T, typename C>::PercolateUp(size_t n) {}
+void PQueue<typename T, typename C>::PercolateUp(size_t n) {
+  while (HasParent(n) && cmp(items[n], items[Parent(n)])) {
+    std::swap(items[Parent(n)], items[n]);
+    n = Parent(n);
+  }
+}
 
 template <typename T, typename C>
 void PQueue<typename T, typename C>::PercolateDown(size_t n) {}
