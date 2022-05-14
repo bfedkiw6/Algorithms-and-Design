@@ -57,11 +57,24 @@ T& PQueue<typename T, typename C>::Top() {
   return items[0];
 }
 
+// From Professors Binary Heap Code
 template <typename T, typename C>
-void PQueue<typename T, typename C>::Pop();
+void PQueue<typename T, typename C>::Pop() {
+  if (!cur_size)
+    throw std::underflow_error("Empty priority queue!");
+  // Move last item back to root and reduce heap's size
+  items[0] = std::move(items[cur_size--]);
+  PercolateDown(0);
+}
 
+// From Professors Binary Heap Code, altered to fit no capacity
 template <typename T, typename C>
-void PQueue<typename T, typename C>::Push(const T& item) {}
+void PQueue<typename T, typename C>::Push(const T& item) {
+  // Insert at the end
+  items[++cur_size] = std::move(item);
+  // Percolate up
+  PercolateUp(cur_size);
+}
 
 template <typename T, typename C>
 void PQueue<typename T, typename C>::PercolateUp(size_t n) {}
