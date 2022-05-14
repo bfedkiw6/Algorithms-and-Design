@@ -18,7 +18,7 @@ class PQueue {
   // Remove top of priority queue
   void Pop();
   // Insert item and sort priority queue
-  void Push(const T &item);
+  void Push(const T& item);
 
  private:
   std::vector<T> items;
@@ -26,26 +26,14 @@ class PQueue {
   C cmp;
 
   // Helper methods for indices
-  size_t Root() {
-    return 0;
-  }
-  size_t Parent(size_t n) {
-    return (n - 1) / 2;
-  }
-  size_t LeftChild(size_t n) {
-    return 2 * n + 1;
-  }
-  size_t RightChild(size_t n) {
-    return 2 * n + 2;
-  }
+  size_t Root() { return 0; }
+  size_t Parent(size_t n) { return (n - 1) / 2; }
+  size_t LeftChild(size_t n) { return 2 * n + 1; }
+  size_t RightChild(size_t n) { return 2 * n + 2; }
 
   // Helper methods for node testing
-  bool HasParent(size_t n) {
-    return n != Root();
-  }
-  bool IsNode(size_t n) {
-    return n < cur_size;
-  }
+  bool HasParent(size_t n) { return n != Root(); }
+  bool IsNode(size_t n) { return n < cur_size; }
 
   // Helper methods for restructuring
   void PercolateUp(size_t n);
@@ -56,28 +44,35 @@ class PQueue {
 };
 
 // To be completed below
-size_t PQueue::Size() {
-  return curr_size;
+template <typename T, typename C>
+size_t PQueue<typename T, typename C>::Size() {
+  return cur_size;
 }
 
-T& PQueue::Top() {
-  if (curr_size == 0)
+template <typename T, typename C>
+T& PQueue<typename T, typename C>::Top() {
+  if (cur_size == 0)
     throw std::underflow_error("Empty priority queue!");
   return items.front();
 }
 
-void PQueue::Pop() {
-  if (curr_size == 0)
+template <typename T, typename C>
+void PQueue<typename T, typename C>::Pop() {
+  if (cur_size == 0)
     throw std::underflow_error("Empty priority queue!");
   items.pop_front();
 }
 
-void PQueue::Push(const T &item);
+template <typename T, typename C>
+void PQueue<typename T, typename C>::Push(const T& item) {}
 
-void PQueue::PercolateUp(size_t n);
+template <typename T, typename C>
+void PQueue<typename T, typename C>::PercolateUp(size_t n) {}
 
-void PQueue::PercolateDown(size_t n);
+template <typename T, typename C>
+void PQueue<typename T, typename C>::PercolateDown(size_t n) {}
 
-bool PQueue::CompareNodes(size_t i, size_t j);
+template <typename T, typename C>
+bool PQueue<typename T, typename C>::CompareNodes(size_t i, size_t j) {}
 
 #endif  // PQUEUE_H_
