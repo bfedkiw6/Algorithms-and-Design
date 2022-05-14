@@ -56,5 +56,28 @@ class PQueue {
 };
 
 // To be completed below
+size_t PQueue::Size() {
+  return curr_size;
+}
+
+T& PQueue::Top() {
+  if (curr_size == 0)
+    throw std::underflow_error("Empty priority queue!");
+  return items.front();
+}
+
+void PQueue::Pop() {
+  if (curr_size == 0)
+    throw std::underflow_error("Empty priority queue!");
+  items.pop_front();
+}
+
+void PQueue::Push(const T &item);
+
+void PQueue::PercolateUp(size_t n);
+
+void PQueue::PercolateDown(size_t n);
+
+bool PQueue::CompareNodes(size_t i, size_t j);
 
 #endif  // PQUEUE_H_
