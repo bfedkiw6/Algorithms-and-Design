@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
+#include <utility>
 #include <vector>
 
 template <typename T, typename C = std::less<T>>
@@ -45,13 +46,13 @@ class PQueue {
 
 // To be completed below
 template <typename T, typename C>
-size_t PQueue<typename T, typename C>::Size() {
+size_t PQueue<T, C>::Size() {
   return cur_size;
 }
 
 // From Professor's Binary Heap Code
 template <typename T, typename C>
-T& PQueue<typename T, typename C>::Top() {
+T& PQueue<T, C>::Top() {
   if (!cur_size)
     throw std::underflow_error("Empty priority queue!");
   return items[0];
@@ -59,26 +60,28 @@ T& PQueue<typename T, typename C>::Top() {
 
 // From Professor's Binary Heap Code
 template <typename T, typename C>
-void PQueue<typename T, typename C>::Pop() {
+void PQueue<T, C>::Pop() {
   if (!cur_size)
     throw std::underflow_error("Empty priority queue!");
   // Move last item back to root and reduce heap's size
-  items[0] = std::move(items[cur_size--]);
+  items[0] = std::move(items[--cur_size]);
+  items.pop_back();
   PercolateDown(0);
 }
 
 // From Professor's Binary Heap Code, altered to fit no capacity
 template <typename T, typename C>
-void PQueue<typename T, typename C>::Push(const T& item) {
+void PQueue<T, C>::Push(const T& item) {
   // Insert at the end
-  items[++cur_size] = std::move(item);
+  items.push_back(std::move(item));
+  cur_size++;
   // Percolate up
-  PercolateUp(cur_size);
+  PercolateUp(cur_size - 1);
 }
 
 // Modified from Professor's code to use the cmp given in the template
 template <typename T, typename C>
-void PQueue<typename T, typename C>::PercolateUp(size_t n) {
+void PQueue<T, C>::PercolateUp(size_t n) {
   while (HasParent(n) && CompareNodes(n, Parent(n))) {
     std::swap(items[Parent(n)], items[n]);
     n = Parent(n);
@@ -87,7 +90,7 @@ void PQueue<typename T, typename C>::PercolateUp(size_t n) {
 
 // Modified from Professor's code to use the cmp given in the template
 template <typename T, typename C>
-void PQueue<typename T, typename C>::PercolateDown(size_t n) {
+void PQueue<T, C>::PercolateDown(size_t n) {
   while (IsNode(LeftChild(n))) {
     size_t child = LeftChild(n);
 
@@ -105,7 +108,7 @@ void PQueue<typename T, typename C>::PercolateDown(size_t n) {
 
 // True if node at i is "less" than node at j
 template <typename T, typename C>
-bool PQueue<typename T, typename C>::CompareNodes(size_t i, size_t j) {
+bool PQueue<T, C>::CompareNodes(size_t i, size_t j) {
   return cmp(items[i], items[j]);
 }
 
