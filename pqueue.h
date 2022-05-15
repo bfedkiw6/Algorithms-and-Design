@@ -49,7 +49,7 @@ size_t PQueue<typename T, typename C>::Size() {
   return cur_size;
 }
 
-// From Professors Binary Heap Code
+// From Professor's Binary Heap Code
 template <typename T, typename C>
 T& PQueue<typename T, typename C>::Top() {
   if (!cur_size)
@@ -57,7 +57,7 @@ T& PQueue<typename T, typename C>::Top() {
   return items[0];
 }
 
-// From Professors Binary Heap Code
+// From Professor's Binary Heap Code
 template <typename T, typename C>
 void PQueue<typename T, typename C>::Pop() {
   if (!cur_size)
@@ -67,7 +67,7 @@ void PQueue<typename T, typename C>::Pop() {
   PercolateDown(0);
 }
 
-// From Professors Binary Heap Code, altered to fit no capacity
+// From Professor's Binary Heap Code, altered to fit no capacity
 template <typename T, typename C>
 void PQueue<typename T, typename C>::Push(const T& item) {
   // Insert at the end
@@ -76,18 +76,37 @@ void PQueue<typename T, typename C>::Push(const T& item) {
   PercolateUp(cur_size);
 }
 
+// Modified from Professor's code to use the cmp given in the template
 template <typename T, typename C>
 void PQueue<typename T, typename C>::PercolateUp(size_t n) {
-  while (HasParent(n) && cmp(items[n], items[Parent(n)])) {
+  while (HasParent(n) && CompareNodes(n, Parent(n))) {
     std::swap(items[Parent(n)], items[n]);
     n = Parent(n);
   }
 }
 
+// Modified from Professor's code to use the cmp given in the template
 template <typename T, typename C>
-void PQueue<typename T, typename C>::PercolateDown(size_t n) {}
+void PQueue<typename T, typename C>::PercolateDown(size_t n) {
+  while (IsNode(LeftChild(n))) {
+    size_t child = LeftChild(n);
 
+    if (IsNode(RightChild(n)) && CompareNodes(RightChild(n), child))
+      child = RightChild(n);
+
+    if (CompareNodes(child, n))
+      std::swap(items[child], items[n]);
+    else
+      break;
+
+    n = child;
+  }
+}
+
+// True if node at i is "less" than node at j
 template <typename T, typename C>
-bool PQueue<typename T, typename C>::CompareNodes(size_t i, size_t j) {}
+bool PQueue<typename T, typename C>::CompareNodes(size_t i, size_t j) {
+  return cmp(items[i], items[j]);
+}
 
 #endif  // PQUEUE_H_
