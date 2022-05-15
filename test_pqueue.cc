@@ -4,6 +4,95 @@
 
 #include "pqueue.h"
 
+TEST(PQueue, Push) {
+  PQueue<int> pq;
+
+  pq.Push(28);
+  EXPECT_EQ(pq.Top(), 28);
+  pq.Push(19);
+  EXPECT_EQ(pq.Top(), 19);
+  pq.Push(50);
+  EXPECT_EQ(pq.Top(), 19);
+  pq.Push(20);
+  EXPECT_EQ(pq.Top(), 19);
+  pq.Push(3);
+  EXPECT_EQ(pq.Top(), 3);
+  pq.Push(1);
+  EXPECT_EQ(pq.Top(), 1);
+  EXPECT_EQ(pq.Size(), 6);
+}
+
+TEST(PQueue, Top) {
+  PQueue<int> pq;
+
+  EXPECT_THROW(pq.Top(), std::exception);
+
+  pq.Push(28);
+  pq.Push(19);
+  pq.Push(50);
+  pq.Push(20);
+  pq.Push(3);
+  pq.Push(1);
+  EXPECT_EQ(pq.Top(), 1);
+}
+
+TEST(PQueue, Pop) {
+  PQueue<int> pq;
+
+  EXPECT_THROW(pq.Pop(), std::exception);
+
+  pq.Push(28);
+  pq.Push(19);
+  pq.Push(50);
+  pq.Push(20);
+  pq.Push(3);
+  pq.Push(1);
+  EXPECT_EQ(pq.Top(), 1);
+  EXPECT_EQ(pq.Size(), 6);
+
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 3);
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 19);
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 20);
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 28);
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 50);
+  pq.Pop();
+
+  EXPECT_THROW(pq.Top(), std::exception);
+  EXPECT_EQ(pq.Size(), 0);
+}
+
+TEST(PQueue, Size) {
+  PQueue<int> pq;
+
+  EXPECT_EQ(pq.Size(), 0);
+
+  pq.Push(28);
+  EXPECT_EQ(pq.Size(), 1);
+  pq.Push(19);
+  pq.Push(50);
+  pq.Push(20);
+  EXPECT_EQ(pq.Size(), 4);
+  pq.Push(3);
+  pq.Push(1);
+  EXPECT_EQ(pq.Size(), 6);
+
+  pq.Pop();
+  EXPECT_EQ(pq.Size(), 5);
+  pq.Pop();
+  pq.Pop();
+  EXPECT_EQ(pq.Size(), 3);
+  pq.Pop();
+  pq.Pop();
+  EXPECT_EQ(pq.Size(), 1);
+  pq.Pop();
+  EXPECT_EQ(pq.Size(), 0);
+}
+
 TEST(PQueue, less) {
   PQueue<int> pq;
 
