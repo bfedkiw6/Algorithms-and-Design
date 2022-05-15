@@ -35,10 +35,18 @@ TEST(PQueue, great) {
 class MyClass {
  public:
   explicit MyClass(int n) : n_(n) {}
-  bool operator < (const MyClass &mc) const { return n_ < mc.n_; }
+  bool operator<(const MyClass& mc) const { return n_ < mc.n_; }
   int n() { return n_; }
+
  private:
   int n_;
+};
+
+class CompareMyClass {
+ public:
+  bool operator()(MyClass* kObj1, MyClass* kObj2) {
+    return kObj1->n() < kObj2->n();
+  }
 };
 
 TEST(PQueue, custom_class) {
@@ -56,12 +64,11 @@ TEST(PQueue, custom_class) {
   EXPECT_EQ(pq.Top().n(), vec[1].n());
 }
 
-#if 0
 TEST(PQueue, custom_class_pointer) {
-  std::vector<MyClass*> vec{new MyClass(42), new MyClass(23),
-                            new MyClass(2), new MyClass(34)};
+  std::vector<MyClass*> vec{new MyClass(42), new MyClass(23), new MyClass(2),
+                            new MyClass(34)};
 
-  PQueue<MyClass*, /* ??? */> pq;
+  PQueue<MyClass*, CompareMyClass> pq;
   pq.Push(vec[0]);
   pq.Push(vec[1]);
   pq.Push(vec[2]);
@@ -72,9 +79,8 @@ TEST(PQueue, custom_class_pointer) {
   pq.Pop();
   EXPECT_EQ(pq.Top(), vec[1]);
 }
-#endif
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
