@@ -20,4 +20,4 @@ test_bstream: test_bstream.cc bstream.h
 	$(CXX) $(CXXFLAGS) -o $@ $< -lgtest -lpthread
 
 clean:
-	rm -f $(targets)
+	rm -f $(targets) test_pqueue test_bstream
