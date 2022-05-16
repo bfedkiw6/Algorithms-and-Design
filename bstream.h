@@ -39,6 +39,7 @@ bool BinaryInputStream::GetBit() {
     RefillBuffer();
 
   avail--;
+  // Check if bit is 0 or 1, doesn't shift buffer
   bit = ((buffer >> avail) & 1) == 1;
 
 #if 0  // Switch to 1 for debug purposes
@@ -59,7 +60,7 @@ char BinaryInputStream::GetChar() {
 
   for (int i = 0; i < 8; i++) {
     curr_bit = GetBit();
-    if (curr_bit == 0)
+    if (!curr_bit)
       current_byte = 0x00;
     else
       current_byte = 0x80 >> i;
@@ -71,13 +72,23 @@ char BinaryInputStream::GetChar() {
   return read_byte;
 }
 
+char BinaryInputStream::GetChar() {
+  // To be completed
+  char read_char = 0;
+
+  for (int i = 0; i < 8; i++)
+    read_char = read_char << 1 | GetBit();
+
+  return read_char;
+}
+
 int BinaryInputStream::GetInt() {
   // To be completed
   int current_byte;
   bool curr_bit;
   int read_byte = 0x00000000;
 
-  for(int i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++) {
     curr_bit = GetBit();
     if (curr_bit == 0)
       current_byte = 0x00000000;
@@ -89,6 +100,16 @@ int BinaryInputStream::GetInt() {
   }
 
   return read_byte;
+}
+
+int BinaryInputStream::GetInt() {
+  // To be completed
+  int read_int = 0;
+
+  for (int i = 0; i < sizeof(int) * 8; i++)
+    read_int = read_int << 1 | GetBit();
+
+  return read_int;
 }
 
 class BinaryOutputStream {
