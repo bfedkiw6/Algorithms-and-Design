@@ -14,10 +14,8 @@ int main(int argc, char *argv[]) {
   // Truncate output
   std::ofstream ofs(filename,
                     std::ios::out | std::ios::trunc | std::ios::binary);
-  ofs.close();
 
-  std::ifstream ifs(argv[1], std::ios::in | std::ios::binary);
-  std::ofstream ofs(filename, std::ios::out | std::ios::binary);
+  std::ofstream ifs(filename, std::ios::in | std::ios::binary);
 
   h.Decompress(ifs, ofs);
 
