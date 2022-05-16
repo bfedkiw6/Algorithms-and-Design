@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "pqueue.h"
+#include "./pqueue.h"
 
 TEST(PQueue, Push) {
   PQueue<int> pq;

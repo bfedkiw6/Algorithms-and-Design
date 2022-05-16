@@ -22,7 +22,7 @@ class BinaryInputStream {
   void RefillBuffer();
 };
 
-BinaryInputStream::BinaryInputStream(std::ifstream &ifs) : ifs(ifs) { }
+BinaryInputStream::BinaryInputStream(std::ifstream &ifs) : ifs(ifs) {}
 
 void BinaryInputStream::RefillBuffer() {
   // Read the next byte from the input stream
@@ -57,7 +57,7 @@ char BinaryInputStream::GetChar() {
   bool curr_bit;
   char read_byte = 0x00;
 
-  for(int i = 0; i < 8; i++) {
+  for (int i = 0; i < 8; i++) {
     curr_bit = GetBit();
     if (curr_bit == 0)
       current_byte = 0x00;
@@ -95,15 +95,11 @@ class BinaryOutputStream {
   void FlushBuffer();
 };
 
-BinaryOutputStream::BinaryOutputStream(std::ofstream &ofs) : ofs(ofs) { }
+BinaryOutputStream::BinaryOutputStream(std::ofstream &ofs) : ofs(ofs) {}
 
-BinaryOutputStream::~BinaryOutputStream() {
-  Close();
-}
+BinaryOutputStream::~BinaryOutputStream() { Close(); }
 
-void BinaryOutputStream::Close() {
-  FlushBuffer();
-}
+void BinaryOutputStream::Close() { FlushBuffer(); }
 
 void BinaryOutputStream::FlushBuffer() {
   // Nothing to flush
