@@ -74,9 +74,9 @@ char BinaryInputStream::GetChar() {
 
 char BinaryInputStream::GetChar() {
   // To be completed
-  char read_char = 0;
+  char read_char = 0x00;
 
-  for (int i = 0; i < 8; i++)
+  for (int i = 0; i < CHAR_BIT; i++)
     read_char = read_char << 1 | GetBit();
 
   return read_char;
@@ -104,10 +104,10 @@ int BinaryInputStream::GetInt() {
 
 int BinaryInputStream::GetInt() {
   // To be completed
-  int read_int = 0;
+  int read_int = 0x00;
 
-  for (int i = 0; i < sizeof(int) * 8; i++)
-    read_int = read_int << 1 | GetBit();
+  for (int i = 0; i < sizeof(int); i++)
+    read_int = read_int << CHAR_BIT | GetChar();
 
   return read_int;
 }
