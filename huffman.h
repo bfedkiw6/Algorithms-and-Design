@@ -55,6 +55,7 @@ class Huffman {
   // Helper methods...
   // this needs to be changed, possibly to a vector of pairs?
   std::vector<int> freq_vector;
+  std::vector<HuffmanNode> vec;
 
   void CountFrequency(std::ifstream &ifs);
 };
@@ -72,7 +73,10 @@ void Huffman::CountFrequency(std::ifstream &ifs) {
   }
 }
 
-static void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs);
+static void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
+  CountFrequency(ifs);
+  PQueue<HuffmanNode> pq;
+}
 
 static void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs);
 
