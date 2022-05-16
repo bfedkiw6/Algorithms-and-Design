@@ -54,26 +54,6 @@ bool BinaryInputStream::GetBit() {
 
 char BinaryInputStream::GetChar() {
   // To be completed
-  char current_byte;
-  bool curr_bit;
-  char read_byte = 0x00;
-
-  for (int i = 0; i < 8; i++) {
-    curr_bit = GetBit();
-    if (!curr_bit)
-      current_byte = 0x00;
-    else
-      current_byte = 0x80 >> i;
-
-    read_byte = read_byte | current_byte;
-    buffer = buffer << 1;
-  }
-
-  return read_byte;
-}
-
-char BinaryInputStream::GetChar() {
-  // To be completed
   char read_char = 0x00;
 
   for (int i = 0; i < CHAR_BIT; i++)
@@ -84,30 +64,10 @@ char BinaryInputStream::GetChar() {
 
 int BinaryInputStream::GetInt() {
   // To be completed
-  int current_byte;
-  bool curr_bit;
-  int read_byte = 0x00000000;
-
-  for (int i = 0; i < 32; i++) {
-    curr_bit = GetBit();
-    if (curr_bit == 0)
-      current_byte = 0x00000000;
-    else
-      current_byte = 0x80000000 >> i;
-
-    read_byte = read_byte | current_byte;
-    buffer = buffer << 1;
-  }
-
-  return read_byte;
-}
-
-int BinaryInputStream::GetInt() {
-  // To be completed
   int read_int = 0x00;
 
-  for (int i = 0; i < sizeof(int); i++)
-    read_int = read_int << CHAR_BIT | GetChar();
+  for (int i = 0; i < sizeof(int) * CHAR_BIT; i++)
+    read_int = read_int << 1 | GetBit();
 
   return read_int;
 }
@@ -166,12 +126,23 @@ void BinaryOutputStream::PutBit(bool bit) {
     FlushBuffer();
 }
 
+// The & 0x1 checks the bit so that if the shift to the right
+// induced any 1s to the left of the bit we are putting,
+// the 1s get forced to 0
 void BinaryOutputStream::PutChar(char byte) {
   // To be completed
+  for (int i = CHAR_BIT - 1; i >= 0; i--) {
+    bool bit = byte >> i & 0x1;
+    PutBit(bit);
+  }
 }
 
 void BinaryOutputStream::PutInt(int word) {
   // To be completed
+  for (int i = sizeof(int) * CHAR_BIT - 1; i >= 0; i--) {
+    bool bit = word >> i & 0x1;
+    PutBit(bit);
+  }
 }
 
 #endif  // BSTREAM_H_
