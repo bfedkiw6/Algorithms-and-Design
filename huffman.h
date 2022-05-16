@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "bstream.h"
 #include "pqueue.h"
@@ -52,8 +53,27 @@ class Huffman {
 
  private:
   // Helper methods...
+  // this needs to be changed, possibly to a vector of pairs?
+  std::vector<int> freq_vector;
+
+  void CountFrequency(std::ifstream &ifs);
 };
 
 // To be completed below
+void Huffman::CountFrequency(std::ifstream &ifs) {
+  std::string line;
+
+  while(std::getline(ifs, line)) {
+    for(int i = 0; i < line.length(); ++i) {
+      char ch = line[i];
+
+
+    }
+  }
+}
+
+static void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs);
+
+static void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs);
 
 #endif  // HUFFMAN_H_
