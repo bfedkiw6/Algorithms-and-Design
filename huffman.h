@@ -207,7 +207,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
     }
   }
 
-  // TODO: check if there are any memory leaks
+  // TODO(ethanbwang): check if there are any memory leaks
   DeleteHuffmanTree(huffman_tree.Top());
   bos.Close();
 }
