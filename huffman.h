@@ -6,7 +6,9 @@
 #include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <queue>
 #include <sstream>
+#include <stack>
 #include <string>
 
 #include "bstream.h"
@@ -69,6 +71,8 @@ class Huffman {
   static void CreateCodeTable(HuffmanNode *node,
                               std::array<std::string, 128> &code_table,
                               std::string path);
+
+  // Decompress Helpers
 };
 
 // To be completed below
@@ -144,16 +148,66 @@ void Huffman::CreateCodeTable(HuffmanNode *node,
   }
 }
 
+void DeleteHuffmanTree(HuffmanNode *root) {
+  std::queue<HuffmanNode *> node_store;
+  node_store.push(root);
+
+  while (!node_store.empty()) {
+    if (node_store.front()->left())
+      node_store.push(node_store.front()->left());
+    if (node_store.front()->right())
+      node_store.push(node_store.front()->right());
+
+    delete node_store.front();
+    node_store.pop();
+  }
+}
+
 void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   std::array<int, 128> freq_array = {0};
   PQueue<HuffmanNode *, CompareHuffmanNodes> huffman_tree;
   std::string encoded_tree;
   std::array<std::string, 128> code_table = {""};
 
+  // Gather necessary data
   CountFrequency(ifs, freq_array);
   BuildHuffmanTree(freq_array, huffman_tree);
   EncodeTree(huffman_tree, encoded_tree);
   CreateCodeTable(huffman_tree.Top(), code_table, "");
+
+  // Write to file
+  BinaryOutputStream bos(ofs);
+
+  // Write encoded tree
+  for (int i = 0; i < encoded_tree.size(); i++) {
+    if (encoded_tree[i] == '0') {
+      bos.PutBit(0);
+    } else {
+      bos.PutBit(1);
+      bos.PutChar(encoded_tree[++i]);
+    }
+  }
+  // Write number of characters
+  bos.PutInt(huffman_tree.Top()->freq());
+  // Write encoded characters
+  for (int i = 0; i < 128; i++) {
+    if (freq_array[i] == 0)
+      continue;
+
+    for (int j = 0; j < freq_array[i]; j++) {
+      std::string compressed_char = code_table[i];
+      for (int k = 0; k < compressed_char.size(); k++) {
+        if (compressed_char[k] == '0')
+          bos.PutBit(0);
+        else
+          bos.PutBit(1);
+      }
+    }
+  }
+
+  // TODO: check if there are any memory leaks
+  DeleteHuffmanTree(huffman_tree.Top());
+  bos.Close();
 }
 
 void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {}
