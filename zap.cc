@@ -8,12 +8,13 @@
 
 int main(int argc, char *argv[]) {
   Huffman h;
-  std::string filename{"truncated_input"};
 
-  std::ifstream ifs(filename,
-                    std::ios::in | std::ios::trunc | std::ios::binary);
+  std::ifstream ifs(argv[1], std::ios::in);
 
-  std::ofstream ofs(argv[2], std::ios::out | std::ios::binary);
+  std::ofstream ofs;
+  ofs.open(argv[2]);
+  if (ofs)
+    ofs.open(argv[2], std::ios::out | std::ios::trunc | std::ios::binary);
 
   h.Compress(ifs, ofs);
 
