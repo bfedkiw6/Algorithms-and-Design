@@ -54,6 +54,8 @@ class Huffman {
   // Helper methods...
 
   // Compress Helpers
+
+  // Compares HuffmanNode pointers
   class CompareHuffmanNodes {
    public:
     bool operator()(HuffmanNode *node1, HuffmanNode *node2) {
