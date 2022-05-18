@@ -67,12 +67,9 @@ class Huffman {
   static void BuildHuffmanTree(
       std::array<int, 128> &freq_array,
       PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree);
-  static void EncodeTree(
-      PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree,
-      std::string &encoded_tree);
-  static void CreateCodeTable(HuffmanNode *node,
-                              std::array<std::string, 128> &code_table,
-                              std::string path);
+  static void Encoding(HuffmanNode *node,
+                       std::array<std::string, 128> &code_table,
+                       std::string path, std::string &encoded_string);
 
   // Decompress Helpers
 };
@@ -110,41 +107,19 @@ void Huffman::BuildHuffmanTree(
   assert(huffman_tree.Size() == 1);
 }
 
-void Huffman::EncodeTree(
-    PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree,
-    std::string &encoded_tree) {
-  std::stack<HuffmanNode *> traversal_stack;
-  traversal_stack.push(huffman_tree.Top());
-
-  while (!traversal_stack.empty()) {
-    HuffmanNode *n = traversal_stack.top();
-    traversal_stack.pop();
-
-    if (!n->IsLeaf()) {
-      if (n->right())
-        traversal_stack.push(n->right());
-      if (n->left())
-        traversal_stack.push(n->left());
-      encoded_tree += '0';
-    } else {
-      encoded_tree += '1';
-      encoded_tree += static_cast<char>(n->data());
-    }
-  }
-}
-
-void Huffman::CreateCodeTable(HuffmanNode *node,
-                              std::array<std::string, 128> &code_table,
-                              std::string path) {
+void Huffman::Encoding(HuffmanNode *node,
+                       std::array<std::string, 128> &code_table,
+                       std::string path, std::string &encoded_string) {
   if (node->IsLeaf()) {
     code_table[node->data()] = path;
+    encoded_string += '1';
+    encoded_string += static_cast<char>(node->data());
   } else {
-    if (node->left()) {
-      CreateCodeTable(node->left(), code_table, path + '0');
-    }
-    if (node->right()) {
-      CreateCodeTable(node->right(), code_table, path + '1');
-    }
+    encoded_string += '0';
+    if (node->left())
+      Encoding(node->left(), code_table, path + '0', encoded_string);
+    if (node->right())
+      Encoding(node->right(), code_table, path + '1', encoded_string);
   }
 }
 
@@ -177,8 +152,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   // Gather necessary data
   CountFrequency(file_contents, freq_array);
   BuildHuffmanTree(freq_array, huffman_tree);
-  EncodeTree(huffman_tree, encoded_tree);
-  CreateCodeTable(huffman_tree.Top(), code_table, "");
+  Encoding(huffman_tree.Top(), code_table, "", encoded_tree);
 
   // Write to file
   BinaryOutputStream bos(ofs);
