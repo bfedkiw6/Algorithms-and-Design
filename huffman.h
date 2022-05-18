@@ -221,12 +221,10 @@ void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
 
   while(bis) {
     // Rebuild Huffman Tree (INCOMPLETE)
+    huffman_tree.Push(new HuffmanNode(0, 1));
     bool curr_bit = bis.GetBit();
-    if (curr_bit == 0) {
-      huffman_tree.Push(new HuffmanNode(0, 1);
-      while (curr_bit != 1) {
-        curr_bit = bis.GetBit();
-      }
+    while (curr_bit != 1) {
+      curr_bit = bis.GetBit();
     }
     huffman_tree.Push(new HuffmanNode(bis.GetChar(), 1);
 
