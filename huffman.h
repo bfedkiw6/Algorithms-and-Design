@@ -54,7 +54,6 @@ class Huffman {
   // Helper methods...
 
   // Compress Helpers
-
   // Compares HuffmanNode pointers
   class CompareHuffmanNodes {
    public:
@@ -121,21 +120,8 @@ void Huffman::Encoding(HuffmanNode *node,
     if (node->right())
       Encoding(node->right(), code_table, path + '1', encoded_string);
   }
-}
 
-void DeleteHuffmanTree(HuffmanNode *root) {
-  std::queue<HuffmanNode *> node_store;
-  node_store.push(root);
-
-  while (!node_store.empty()) {
-    if (node_store.front()->left())
-      node_store.push(node_store.front()->left());
-    if (node_store.front()->right())
-      node_store.push(node_store.front()->right());
-
-    delete node_store.front();
-    node_store.pop();
-  }
+  delete node;
 }
 
 void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
@@ -166,7 +152,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
     }
   }
   // Write number of characters
-  bos.PutInt(huffman_tree.Top()->freq());
+  bos.PutInt(file_contents.size());
   // Write encoded characters
   for (int i = 0; i < file_contents.size(); i++) {
     char cur_char = file_contents[i];
@@ -179,7 +165,6 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
     }
   }
 
-  DeleteHuffmanTree(huffman_tree.Top());
   bos.Close();
 }
 
