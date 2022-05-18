@@ -215,18 +215,35 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
 
 void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
   PQueue<HuffmanNode *, CompareHuffmanNodes> huffman_tree;
+  int iterations;
 
-  BinaryOutputStream bis(ifs);
+  BinaryInputStream bis(ifs);
 
-  std::string line;
-
-  while(std::getline(ifs, line)) {
-    huffman_tree.Push(new HuffmanNode(0, 1);
-    bool curr_bit = bis.GetBit()
-    while (curr_bit != 1) {
-      curr_bit = bis.GetBit()
+  while(bis) {
+    // Rebuild Huffman Tree (INCOMPLETE)
+    bool curr_bit = bis.GetBit();
+    if (curr_bit == 0) {
+      huffman_tree.Push(new HuffmanNode(0, 1);
+      while (curr_bit != 1) {
+        curr_bit = bis.GetBit();
+      }
     }
     huffman_tree.Push(new HuffmanNode(bis.GetChar(), 1);
+
+    // Get number of encoded characters
+    iterations = bis.GetInt();
+
+    // Write characters to output file
+    for (int i = 0; i < iterations; i++) {
+      HuffmanNode *n = huffman_tree.Top();
+      while (!n->IsLeaf()) {
+        if (bis.GetBit() == 0)
+          n = n->left();
+        if (bis.GetBit() == 1)
+          n = n->right();
+      }
+      bos << n->data();
+    }
   }
 }
 
