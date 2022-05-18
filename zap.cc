@@ -20,4 +20,7 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Compressed input file " << argv[1] <<
             " into zap file " << argv[2] << std::endl;
+
+  ifs.close();
+  ofs.close();
 }

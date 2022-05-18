@@ -176,6 +176,7 @@ void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
 
   while (bis) {
     // Rebuild Huffman Tree (INCOMPLETE)
+    int steps_down_tree = 0;
     bool curr_bit = bis.GetBit();
     HuffmanNode *n1 = new HuffmanNode(0, 1);
     curr_bit = bis.GetBit();

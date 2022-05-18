@@ -17,4 +17,8 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Decompressed zap file " << argv[1] <<
                " into output file " << argv[2] << std::endl;
+
+
+  ifs.close();
+  ofs.close();
 }
