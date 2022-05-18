@@ -210,6 +210,22 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   bos.Close();
 }
 
-void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {}
+
+void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
+  PQueue<HuffmanNode *, CompareHuffmanNodes> huffman_tree;
+
+  BinaryOutputStream bis(ifs);
+
+  std::string line;
+
+  while(std::getline(ifs, line)) {
+    huffman_tree.Push(new HuffmanNode(0, 1);
+    bool curr_bit = bis.GetBit()
+    while (curr_bit != 1) {
+      curr_bit = bis.GetBit()
+    }
+    huffman_tree.Push(new HuffmanNode(bis.GetChar(), 1);
+  }
+}
 
 #endif  // HUFFMAN_H_
