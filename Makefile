@@ -5,11 +5,10 @@ CXXFLAGS = -Wall -Werror -std=c++11
 
 all: $(targets)
 
-# Finish the Makefile as we go because I'm not sure what the dependencies are yet
-zap: zap.cc huffman.h
+zap: zap.cc huffman.h pqueue.h bstream.h
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-unzap: unzap.cc huffman.h
+unzap: unzap.cc huffman.h pqueue.h bstream.h
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 # The rules below are just for our googletesting purposes
@@ -18,6 +17,9 @@ test_pqueue: test_pqueue.cc pqueue.h
 
 test_bstream: test_bstream.cc bstream.h
 	$(CXX) $(CXXFLAGS) -o $@ $< -lgtest -lpthread
+
+lint:
+	~/Programs/C++_Code/cpplint *.cc *.h
 
 clean:
 	rm -f $(targets) test_pqueue test_bstream

@@ -54,6 +54,8 @@ class Huffman {
   // Helper methods...
 
   // Compress Helpers
+
+  // Compares HuffmanNode pointers
   class CompareHuffmanNodes {
    public:
     bool operator()(HuffmanNode *node1, HuffmanNode *node2) {
@@ -205,7 +207,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
     }
   }
 
-  // TODO: check if there are any memory leaks
+  // TODO(ethanbwang): check if there are any memory leaks
   DeleteHuffmanTree(huffman_tree.Top());
   bos.Close();
 }
