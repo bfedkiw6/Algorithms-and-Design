@@ -62,7 +62,7 @@ class Huffman {
       return *node1 < *node2;
     }
   };
-  static void CountFrequency(std::ifstream &ifs,
+  static void CountFrequency(std::string &file_contents,
                              std::array<int, 128> &freq_array);
   static void BuildHuffmanTree(
       std::array<int, 128> &freq_array,
@@ -78,12 +78,10 @@ class Huffman {
 };
 
 // To be completed below
-void Huffman::CountFrequency(std::ifstream &ifs,
+void Huffman::CountFrequency(std::string &file_contents,
                              std::array<int, 128> &freq_array) {
-  char cur_char;
-
-  while (ifs >> cur_char)
-    freq_array[cur_char]++;
+  for (int i = 0; i < file_contents.size(); i++)
+    freq_array[file_contents[i]]++;
 }
 
 void Huffman::BuildHuffmanTree(
@@ -166,20 +164,24 @@ void DeleteHuffmanTree(HuffmanNode *root) {
 }
 
 void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
+  std::string file_contents;
   std::array<int, 128> freq_array = {0};
   PQueue<HuffmanNode *, CompareHuffmanNodes> huffman_tree;
   std::string encoded_tree;
   std::array<std::string, 128> code_table = {""};
 
+  // Read data into string
+  char cur_char;
+  while (ifs >> cur_char)
+    file_contents += cur_char;
   // Gather necessary data
-  CountFrequency(ifs, freq_array);
+  CountFrequency(file_contents, freq_array);
   BuildHuffmanTree(freq_array, huffman_tree);
   EncodeTree(huffman_tree, encoded_tree);
   CreateCodeTable(huffman_tree.Top(), code_table, "");
 
   // Write to file
   BinaryOutputStream bos(ofs);
-
   // Write encoded tree
   for (int i = 0; i < encoded_tree.size(); i++) {
     if (encoded_tree[i] == '0') {
@@ -192,26 +194,20 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   // Write number of characters
   bos.PutInt(huffman_tree.Top()->freq());
   // Write encoded characters
-  for (int i = 0; i < 128; i++) {
-    if (freq_array[i] == 0)
-      continue;
-
-    for (int j = 0; j < freq_array[i]; j++) {
-      std::string compressed_char = code_table[i];
-      for (int k = 0; k < compressed_char.size(); k++) {
-        if (compressed_char[k] == '0')
-          bos.PutBit(0);
-        else
-          bos.PutBit(1);
-      }
+  for (int i = 0; i < file_contents.size(); i++) {
+    char cur_char = file_contents[i];
+    std::string compressed_char = code_table[cur_char];
+    for (int j = 0; j < compressed_char.size(); j++) {
+      if (compressed_char[j] == '0')
+        bos.PutBit(0);
+      else
+        bos.PutBit(1);
     }
   }
 
-  // TODO(ethanbwang): check if there are any memory leaks
   DeleteHuffmanTree(huffman_tree.Top());
   bos.Close();
 }
-
 
 void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
   PQueue<HuffmanNode *, CompareHuffmanNodes> huffman_tree;
@@ -219,7 +215,7 @@ void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
 
   BinaryInputStream bis(ifs);
 
-  while(bis) {
+  while (bis) {
     // Rebuild Huffman Tree (INCOMPLETE)
     huffman_tree.Push(new HuffmanNode(0, 1));
     bool curr_bit = bis.GetBit();
