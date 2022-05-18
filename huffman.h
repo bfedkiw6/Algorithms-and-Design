@@ -69,8 +69,9 @@ class Huffman {
   static void Encoding(HuffmanNode *node,
                        std::array<std::string, 128> &code_table,
                        std::string path, std::string &encoded_string);
-
   // Decompress Helpers
+  static void ReadEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
+                                PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree);
 };
 
 // To be completed below
@@ -168,14 +169,32 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   bos.Close();
 }
 
+void Huffman::ReadEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
+                                PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree) {
+  // Get number of encoded characters
+  int iterations = bis.GetInt();
+
+  // Write characters to output file
+  for (int i = 0; i < iterations; i++) {
+    HuffmanNode *n = huffman_tree.Top();
+    while (!n->IsLeaf()) {
+      if (bis.GetBit() == 0)
+        n = n->left();
+      if (bis.GetBit() == 1)
+        n = n->right();
+    }
+    ofs << n->data();
+  }
+}
+
 void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
   PQueue<HuffmanNode *, CompareHuffmanNodes> huffman_tree;
-  int iterations;
+
 
   BinaryInputStream bis(ifs);
 
   while (bis) {
-    // Rebuild Huffman Tree 
+    // Rebuild Huffman Tree
     bool curr_bit = bis.GetBit();
     HuffmanNode *n1 = new HuffmanNode(0, 1);
     curr_bit = bis.GetBit();
@@ -210,20 +229,7 @@ void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
       steps_down_tree--;
    }
 
-    // Get number of encoded characters
-    iterations = bis.GetInt();
-
-    // Write characters to output file
-    for (int i = 0; i < iterations; i++) {
-      HuffmanNode *n = huffman_tree.Top();
-      while (!n->IsLeaf()) {
-        if (bis.GetBit() == 0)
-          n = n->left();
-        if (bis.GetBit() == 1)
-          n = n->right();
-      }
-      bos << n->data();
-    }
+    ReadEncodedString(bis, ofs, huffman_tree);
   }
 }
 
