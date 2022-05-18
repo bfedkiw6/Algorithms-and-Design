@@ -176,12 +176,27 @@ void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
 
   while (bis) {
     // Rebuild Huffman Tree (INCOMPLETE)
-    huffman_tree.Push(new HuffmanNode(0, 1));
     bool curr_bit = bis.GetBit();
+    HuffmanNode *n1 = new HuffmanNode(0, 1);
+    curr_bit = bis.GetBit();
+
+    // Build left side of tree before any character nodes
     while (curr_bit != 1) {
+      n1->left() = new HuffmanNode(0, 1);
+      huffman_tree.Push(n1);
+      n1 = n1->left();
       curr_bit = bis.GetBit();
     }
-    huffman_tree.Push(new HuffmanNode(bis.GetChar(), 1);
+
+    // Add character node
+    n1->left() = new HuffmanNode(bis.GetChar(), 1);
+    curr_bit = bis.GetBit();
+
+    while (curr_bit != 0) {
+      n1->right() = new HuffmanNode(bis.GetChar(), 1);
+      huffman_tree.Push(n1);
+      curr_bit = bis.GetBit();
+   }
 
     // Get number of encoded characters
     iterations = bis.GetInt();
