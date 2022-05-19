@@ -116,15 +116,15 @@ TEST(BStream, writeandreadbits) {
   std::ifstream ifs(filename, std::ios::in | std::ios::binary);
   BinaryInputStream bis(ifs);
 
-  EXPECT_EQ(bis.GetChar(), "H");
-  EXPECT_EQ(bis.GetChar(), "e");
-  EXPECT_EQ(bis.GetChar(), "y");
-  EXPECT_EQ(bis.GetChar(), "!");
-  EXPECT_EQ(bis.GetChar(), 2);
-  EXPECT_EQ(bis.GetChar(), 37);
-  EXPECT_EQ(bis.GetChar(), 47);
+  EXPECT_EQ(bis.GetChar(), 0x48);
+  EXPECT_EQ(bis.GetChar(), 0x65);
+  EXPECT_EQ(bis.GetChar(), 0x79);
+  EXPECT_EQ(bis.GetChar(), 0x21);
+  EXPECT_EQ(bis.GetInt(), 0x32);
+  EXPECT_EQ(bis.GetInt(), 0x3337);
+  EXPECT_EQ(bis.GetInt(), 0x3437);
   ifs.close();
-  
+
   std::remove(filename.c_str());
 }
 
