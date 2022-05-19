@@ -93,6 +93,41 @@ TEST(BStream, inputbybits) {
 
   std::remove(filename.c_str());
 }
+
+TEST(BStream, writeandreadbits) {
+  std::string filename{"test_bstream_outputbitandchars"};
+
+  // Write data to file
+  std::ofstream ofs(filename,
+                    std::ios::out | std::ios::trunc | std::ios::binary);
+  BinaryOutputStream bos(ofs);
+
+  // Write a few chars and ints
+  bos.PutChar('H');
+  bos.PutChar('e');
+  bos.PutChar('y');
+  bos.PutChar('!');
+  bos.PutInt(2);
+  bos.PutInt(37);
+  bos.PutInt(47);
+
+  ofs.close();
+
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary);
+  BinaryInputStream bis(ifs);
+
+  EXPECT_EQ(bis.GetChar(), "H");
+  EXPECT_EQ(bis.GetChar(), "e");
+  EXPECT_EQ(bis.GetChar(), "y");
+  EXPECT_EQ(bis.GetChar(), "!");
+  EXPECT_EQ(bis.GetChar(), 2);
+  EXPECT_EQ(bis.GetChar(), 37);
+  EXPECT_EQ(bis.GetChar(), 47);
+  ifs.close();
+  
+  std::remove(filename.c_str());
+}
+
 #if 0
 TEST(BStream, inputnormalfile) {
   std::string filename{"test_bstream_inputnormalfile"};
