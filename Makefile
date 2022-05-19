@@ -22,4 +22,4 @@ lint:
 	~/Programs/C++_Code/cpplint *.cc *.h
 
 clean:
-	rm -f $(targets) test_pqueue test_bstream
+	rm -f $(targets) test_pqueue test_bstream *.zap *.unzap

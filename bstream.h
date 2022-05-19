@@ -127,9 +127,8 @@ void BinaryOutputStream::PutBit(bool bit) {
     FlushBuffer();
 }
 
-// The & 0x1 checks the bit so that if the shift to the right
-// induced any 1s to the left of the bit we are putting,
-// the 1s get forced to 0
+// The & 0x1 masks the byte shifted i to the right so that only the rightmost
+// bit is kept and all other bits are cleared
 void BinaryOutputStream::PutChar(char byte) {
   // To be completed
   for (int i = CHAR_BIT - 1; i >= 0; i--) {
