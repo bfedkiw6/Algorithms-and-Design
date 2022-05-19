@@ -13,13 +13,13 @@ int main(int argc, char *argv[]) {
   // Create variables and open files
   Huffman compressor;
   std::ifstream ifs(argv[1]);
-  std::ofstream ofs(argv[2],
-                    std::ios::out | std::ios::trunc | std::ios::binary);
-
   if (!ifs.is_open()) {
     std::cerr << "Error: cannot open input file " << argv[1] << '\n';
     exit(1);
   }
+
+  std::ofstream ofs(argv[2],
+                    std::ios::out | std::ios::trunc | std::ios::binary);
   if (!ofs.is_open()) {
     std::cerr << "Error: cannot open zap file " << argv[2] << '\n';
     exit(1);
