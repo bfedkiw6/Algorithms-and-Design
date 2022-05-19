@@ -67,7 +67,7 @@ int BinaryInputStream::GetInt() {
   // To be completed
   int read_int = 0x00;
 
-  for (int i = 0; i < sizeof(int) * CHAR_BIT; i++)
+  for (size_t i = 0; i < sizeof(int) * CHAR_BIT; i++)
     read_int = read_int << 1 | GetBit();
 
   return read_int;
