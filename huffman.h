@@ -193,44 +193,41 @@ void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
 
   BinaryInputStream bis(ifs);
 
-  while (bis) {
-    // Rebuild Huffman Tree
-    bool curr_bit = bis.GetBit();
-    HuffmanNode *n1 = new HuffmanNode(0, 1);
-    curr_bit = bis.GetBit();
-    int steps_down_tree = 1;
+  // Rebuild Huffman Tree
+  bool curr_bit = bis.GetBit();
+  HuffmanNode *n1 = new HuffmanNode(0, 1);
+  curr_bit = bis.GetBit();
+  int steps_down_tree = 1;
 
-    // Build left side of tree before any character nodes
-    while (curr_bit != 1) {
-      n1->left() = new HuffmanNode(0, 1);
-      huffman_tree.Push(n1);
-      n1 = n1->left();
-      curr_bit = bis.GetBit();
-      steps_down_tree++;
+  // Build left side of tree before any character nodes
+  while (curr_bit != 1) {
+    n1->left() = new HuffmanNode(0, 1);
+    huffman_tree.Push(n1);
+    n1 = n1->left();
+    curr_bit = bis.GetBit();
+    steps_down_tree++;
+  }
+
+  // Add first left character node
+  n1->left() = new HuffmanNode(bis.GetChar(), 1);
+  huffman_tree.Push(n1);
+  curr_bit = bis.GetBit();
+
+  // Add all right character nodes going up the tree
+  while (curr_bit != 0 && steps_down_tree - 1 >= 0) {
+    HuffmanNode *curr_node = huffman_tree.Top();
+    int curr_step = 0;
+
+    while (curr_step != steps_down_tree) {
+      curr_node = curr_node->left();
+      curr_step++;
     }
 
-    // Add first left character node
-    n1->left() = new HuffmanNode(bis.GetChar(), 1);
-    huffman_tree.Push(n1);
+    curr_node->right() = new HuffmanNode(bis.GetChar(), 1);
     curr_bit = bis.GetBit();
-
-    // Add all right character nodes going up the tree
-    while (curr_bit != 0 && steps_down_tree - 1 >= 0) {
-      HuffmanNode *curr_node = huffman_tree.Top();
-      int curr_step = 0;
-
-      while (curr_step != steps_down_tree) {
-        curr_node = curr_node->left();
-        curr_step++;
-      }
-
-      curr_node->right() = new HuffmanNode(bis.GetChar(), 1);
-      curr_bit = bis.GetBit();
-      steps_down_tree--;
-   }
-
-    ReadEncodedString(bis, ofs, huffman_tree);
+    steps_down_tree--;
   }
+  ReadEncodedString(bis, ofs, huffman_tree);
 }
 
 #endif  // HUFFMAN_H_
