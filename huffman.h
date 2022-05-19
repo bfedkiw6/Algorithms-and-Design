@@ -8,7 +8,6 @@
 #include <iostream>
 #include <queue>
 #include <sstream>
-#include <stack>
 #include <string>
 
 #include "bstream.h"
@@ -146,21 +145,22 @@ HuffmanNode *Huffman::RebuildTree(BinaryInputStream &bis) {
     return new HuffmanNode(0, 0, MakeNode(bis), MakeNode(bis));
 }
 
-// TODO(ethanbwang): Fix this function
 void Huffman::WriteEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
                                  HuffmanNode *huffman_tree) {
   // Get number of encoded characters
-  int iterations = bis.GetInt();
+  int num_chars = bis.GetInt();
 
   // Write characters to output file
-  for (int i = 0; i < iterations; i++) {
-    while (!huffman_tree->IsLeaf()) {  // while not leaf, traverse to find char
-      if (bis.GetBit() == 0)
-        n = n->left();
-      if (bis.GetBit() == 1)
-        n = n->right();
+  for (int i = 0; i < num_chars; i++) {
+    HuffmanNode *cur_node = huffman_tree;
+
+    while (!cur_node->IsLeaf()) {
+      if (bis.GetBit())
+        cur_node = cur_node->right();
+      else
+        cur_node = cur_node->left();
     }
-    ofs << n->data();
+    ofs << cur_node->data();
   }
 }
 
@@ -210,8 +210,9 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
 
 void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
   BinaryInputStream bis(ifs);
-  HuffmanNode *huffman_tree = RebuildTree(bis);
 
+  // Rebuild tree
+  HuffmanNode *huffman_tree = RebuildTree(bis);
   // Write to file
   WriteEncodedString(bis, ofs, huffman_tree);
 
