@@ -8,6 +8,7 @@
 #include <iostream>
 #include <queue>
 #include <sstream>
+#include <streambuf>
 #include <string>
 
 #include "bstream.h"
@@ -171,10 +172,9 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   std::string encoded_tree;
   std::array<std::string, 128> code_table = {""};
 
-  // Read data into string
-  char cur_char;
-  while (ifs >> cur_char)
-    file_contents += cur_char;
+  // Read data into string (taken from website given)
+  file_contents = std::string((std::istreambuf_iterator<char>(ifs)),
+                              std::istreambuf_iterator<char>());
   // Gather necessary data
   CountFrequency(file_contents, freq_array);
   BuildHuffmanTree(freq_array, huffman_tree);
@@ -195,7 +195,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   bos.PutInt(file_contents.size());
   // Write encoded characters
   for (size_t i = 0; i < file_contents.size(); i++) {
-    cur_char = file_contents[i];
+    char cur_char = file_contents[i];
     std::string compressed_char = code_table[cur_char];
     for (size_t j = 0; j < compressed_char.size(); j++) {
       if (compressed_char[j] == '0')
