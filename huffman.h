@@ -173,7 +173,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   std::array<std::string, 128> code_table = {""};
 
   // Read data into string (taken from website given)
-  file_contents = std::string((std::istreambuf_iterator<char>(ifs)),
+  file_contents = std::string(std::istreambuf_iterator<char>(ifs),
                               std::istreambuf_iterator<char>());
   // Gather necessary data
   CountFrequency(file_contents, freq_array);
