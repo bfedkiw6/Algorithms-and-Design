@@ -94,8 +94,8 @@ TEST(BStream, inputbybits) {
   std::remove(filename.c_str());
 }
 
-TEST(BStream, writeandreadbits) {
-  std::string filename{"test_bstream_outputbitandchars"};
+TEST(BStream, writeandread) {
+  std::string filename{"test_bstream_charsandints"};
 
   // Write data to file
   std::ofstream ofs(filename,
