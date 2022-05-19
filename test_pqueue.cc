@@ -165,8 +165,13 @@ TEST(PQueue, custom_class_pointer) {
 
   EXPECT_EQ(pq.Top(), vec[2]);
   EXPECT_EQ(pq.Size(), 4);
+  delete pq.Top();
   pq.Pop();
   EXPECT_EQ(pq.Top(), vec[1]);
+  for (int i = 0; i < 3; i++) {
+    delete pq.Top();
+    pq.Pop();
+  }
 }
 
 int main(int argc, char* argv[]) {
