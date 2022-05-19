@@ -93,6 +93,51 @@ TEST(PQueue, Size) {
   EXPECT_EQ(pq.Size(), 0);
 }
 
+TEST(PQueue, PushPop) {
+  PQueue<int> pq;
+
+  pq.Push(28);
+  pq.Push(56);
+  pq.Push(2);
+  EXPECT_EQ(pq.Top(), 2);
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 28);
+  pq.Push(90);
+  pq.Push(1432);
+  EXPECT_EQ(pq.Top(), 28);
+  pq.Pop();
+  pq.Push(1);
+  pq.Push(0);
+  EXPECT_EQ(pq.Top(), 0);
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 1);
+  EXPECT_EQ(pq.Size(), 4);
+}
+
+TEST(PQueue, Duplicates) {
+  PQueue<int> pq;
+
+  pq.Push(28);
+  pq.Push(28);
+  pq.Push(32);
+  pq.Push(134);
+  pq.Push(940328);
+  pq.Push(29);
+  pq.Push(93);
+  pq.Push(50);
+
+  EXPECT_EQ(pq.Size(), 8);
+  EXPECT_EQ(pq.Top(), 28);
+
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 28);
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), 29);
+  pq.Push(3);
+  EXPECT_EQ(pq.Size(), 7);
+  EXPECT_EQ(pq.Top(), 3);
+}
+
 TEST(PQueue, less) {
   PQueue<int> pq;
 
@@ -138,6 +183,13 @@ class CompareMyClass {
   }
 };
 
+class CompareMyClass2 {
+ public:
+  bool operator()(MyClass* kObj1, MyClass* kObj2) {
+    return kObj1->n() > kObj2->n();
+  }
+};
+
 TEST(PQueue, custom_class) {
   std::vector<MyClass> vec{MyClass(42), MyClass(23), MyClass(2), MyClass(34)};
 
@@ -168,6 +220,29 @@ TEST(PQueue, custom_class_pointer) {
   delete pq.Top();
   pq.Pop();
   EXPECT_EQ(pq.Top(), vec[1]);
+
+  for (int i = 0; i < 3; i++) {
+    delete pq.Top();
+    pq.Pop();
+  }
+}
+
+TEST(PQueue, custom_class_pointer2) {
+  std::vector<MyClass*> vec{new MyClass(42), new MyClass(23), new MyClass(2),
+                            new MyClass(34)};
+
+  PQueue<MyClass*, CompareMyClass2> pq;
+  pq.Push(vec[0]);
+  pq.Push(vec[1]);
+  pq.Push(vec[2]);
+  pq.Push(vec[3]);
+
+  EXPECT_EQ(pq.Top(), vec[0]);
+  EXPECT_EQ(pq.Size(), 4);
+  delete pq.Top();
+  pq.Pop();
+  EXPECT_EQ(pq.Top(), vec[3]);
+
   for (int i = 0; i < 3; i++) {
     delete pq.Top();
     pq.Pop();
