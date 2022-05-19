@@ -1,6 +1,7 @@
 #ifndef BSTREAM_H_
 #define BSTREAM_H_
 
+#include <climits>
 #include <cstddef>
 #include <fstream>
 #include <iostream>

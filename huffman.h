@@ -78,7 +78,7 @@ class Huffman {
 // To be completed below
 void Huffman::CountFrequency(std::string &file_contents,
                              std::array<int, 128> &freq_array) {
-  for (int i = 0; i < file_contents.size(); i++)
+  for (size_t i = 0; i < file_contents.size(); i++)
     freq_array[file_contents[i]]++;
 }
 
@@ -183,7 +183,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   // Write to file (not in a function to not have to pass so many parameters)
   BinaryOutputStream bos(ofs);
   // Write encoded tree
-  for (int i = 0; i < encoded_tree.size(); i++) {
+  for (size_t i = 0; i < encoded_tree.size(); i++) {
     if (encoded_tree[i] == '0') {
       bos.PutBit(0);
     } else {
@@ -194,10 +194,10 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   // Write number of characters
   bos.PutInt(file_contents.size());
   // Write encoded characters
-  for (int i = 0; i < file_contents.size(); i++) {
+  for (size_t i = 0; i < file_contents.size(); i++) {
     cur_char = file_contents[i];
     std::string compressed_char = code_table[cur_char];
-    for (int j = 0; j < compressed_char.size(); j++) {
+    for (size_t j = 0; j < compressed_char.size(); j++) {
       if (compressed_char[j] == '0')
         bos.PutBit(0);
       else
