@@ -160,7 +160,7 @@ void Huffman::WriteEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
       else
         cur_node = cur_node->left();
     }
-    ofs << cur_node->data();
+    ofs << static_cast<char>(cur_node->data());
   }
 }
 
