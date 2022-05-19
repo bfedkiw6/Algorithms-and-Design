@@ -1,25 +1,35 @@
-#include<iostream>
-#include<fstream>
-#include<string>
-#include<cstring>
-#include <cerrno>
+#include <fstream>
+#include <iostream>
+#include <string>
 
 #include "huffman.h"
 
 int main(int argc, char *argv[]) {
-  Huffman h;
+  if (argc != 3) {
+    std::cerr << "Usage: " << argv[0] << " <inputfile> <zapfile>\n";
+    exit(1);
+  }
 
-  std::ifstream ifs(argv[1], std::ios::in);
+  // Create variables and open files
+  Huffman compressor;
+  std::ifstream ifs(argv[1]);
+  std::ofstream ofs(argv[2],
+                    std::ios::out | std::ios::trunc | std::ios::binary);
 
-  std::ofstream ofs;
-  ofs.open(argv[2]);
-  if (ofs)
-    ofs.open(argv[2], std::ios::out | std::ios::trunc | std::ios::binary);
+  if (!ifs.is_open()) {
+    std::cerr << "Error: cannot open input file " << argv[1] << '\n';
+    exit(1);
+  }
+  if (!ofs.is_open()) {
+    std::cerr << "Error: cannot open zap file " << argv[2] << '\n';
+    exit(1);
+  }
 
-  h.Compress(ifs, ofs);
+  // Compress
+  compressor.Compress(ifs, ofs);
 
-  std::cout << "Compressed input file " << argv[1] <<
-            " into zap file " << argv[2] << std::endl;
+  std::cout << "Compressed input file " << argv[1] << " into zap file "
+            << argv[2] << '\n';
 
   ifs.close();
   ofs.close();
