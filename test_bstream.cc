@@ -87,7 +87,7 @@ TEST(BStream, InputByBits) {
 }
 
 TEST(BStream, OutputAndInputByBits) {
-  std::string filename{"test_bstream_outputandinputbybits"};
+  std::string filename{"test_bstream_output_and_input_by_bits"};
 
   // Write data to file
   std::ofstream ofs(filename,
@@ -132,7 +132,7 @@ TEST(BStream, OutputAndInputByBits) {
 }
 
 TEST(BStream, InputError) {
-  std::string filename{"test_inputerror"};
+  std::string filename{"test_input_error"};
 
   // Create empty file
   std::ofstream ofs(filename,
@@ -224,6 +224,82 @@ TEST(BStream, InputIrregularly) {
   ofs.write(reinterpret_cast<const char *>(val), sizeof(val));
   ofs.close();
 
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary);
+  BinaryInputStream bis(ifs);
+
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetChar(), 'D');
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetChar(), 'K');
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetChar(), 'E');
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetChar(), 'W');
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetInt(), 4890320);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetInt(), 28);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_THROW(bis.GetBit(), std::exception);
+
+  ifs.close();
+  std::remove(filename.c_str());
+}
+
+TEST(BStream, OutputAndInputIrregularlySameOrder) {
+  std::string filename{"test_output_and_input_irregularly_same_order"};
+
+  // Write data to file
+  std::ofstream ofs(filename,
+                    std::ios::out | std::ios::trunc | std::ios::binary);
+  BinaryOutputStream bos(ofs);
+
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(0);
+  bos.PutChar('D');
+  bos.PutBit(0);
+  bos.PutBit(0);
+  bos.PutChar('K');
+  bos.PutBit(0);
+  bos.PutChar('E');
+  bos.PutBit(1);
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(1);
+  bos.PutChar('W');
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(0);
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutInt(4890320);
+  bos.PutBit(0);
+  bos.PutInt(28);
+  bos.PutBit(1);
+  bos.PutBit(1);
+
+  bos.Close();
+  ofs.close();
+
+  // Should read same thing back in
   std::ifstream ifs(filename, std::ios::in | std::ios::binary);
   BinaryInputStream bis(ifs);
 
