@@ -5,14 +5,8 @@
 
 #include "bstream.h"
 
-#if 0
-TEST(BStream, outputbybits) {
+TEST(BStream, OutputByBits) {
   std::string filename{"test_bstream_outputbybits"};
-}
-#endif
-
-TEST(BStream, OutputMiscellaneous) {
-  std::string filename{"test_bstream_outputmiscellaneous"};
 
   // Write data to file
   std::ofstream ofs(filename,
@@ -60,7 +54,7 @@ TEST(BStream, OutputMiscellaneous) {
   std::remove(filename.c_str());
 }
 
-TEST(BStream, inputbybits) {
+TEST(BStream, InputByBits) {
   std::string filename{"test_bstream_inputbybits"};
   const unsigned char val[] = {
       0x58, 0x90, 0xab, 0x08, 0x00, 0x4e, 0xdb, 0x40,
@@ -92,8 +86,8 @@ TEST(BStream, inputbybits) {
   std::remove(filename.c_str());
 }
 
-TEST(BStream, writeandread) {
-  std::string filename{"test_bstream_writeandread"};
+TEST(BStream, OutputAndInputByBits) {
+  std::string filename{"test_bstream_outputandinputbybits"};
 
   // Write data to file
   std::ofstream ofs(filename,
@@ -137,11 +131,68 @@ TEST(BStream, writeandread) {
   std::remove(filename.c_str());
 }
 
-#if 0
-TEST(BStream, inputnormalfile) {
-  std::string filename{"test_bstream_inputnormalfile"};
+TEST(BStream, OutputIrregularly) {
+  std::string filename{"test_output_irregularly"};
+
+  // Write data to file
+  std::ofstream ofs(filename,
+                    std::ios::out | std::ios::trunc | std::ios::binary);
+  BinaryOutputStream bos(ofs);
+
+  // 4 chars, 2 ints, 18 bits
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(0);
+  bos.PutChar('D');
+  bos.PutBit(0);
+  bos.PutBit(0);
+  bos.PutChar('K');
+  bos.PutBit(0);
+  bos.PutChar('E');
+  bos.PutBit(1);
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(1);
+  bos.PutChar('W');
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(0);
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutInt(4890320);
+  bos.PutBit(0);
+  bos.PutInt(28);
+  bos.PutBit(1);
+  bos.PutBit(1);
+
+  bos.Close();
+  ofs.close();
+
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary);
+  unsigned char val[15];
+  ifs.read(reinterpret_cast<char *>(val), sizeof(val));
+  ifs.close();
+
+  // 01001000 10000010 01011001 00010110 11010101 11010010 00000000 10010101
+  // 00111101 10100000 00000000 00000000 00000000 00011100 11000000
+  EXPECT_EQ(val[0], 0x48);
+  EXPECT_EQ(val[1], 0x82);
+  EXPECT_EQ(val[2], 0x59);
+  EXPECT_EQ(val[3], 0x16);
+  EXPECT_EQ(val[4], 0xD5);
+  EXPECT_EQ(val[5], 0xD2);
+  EXPECT_EQ(val[6], 0x0);
+  EXPECT_EQ(val[7], 0x95);
+  EXPECT_EQ(val[8], 0x3D);
+  EXPECT_EQ(val[9], 0xA0);
+  EXPECT_EQ(val[10], 0x0);
+  EXPECT_EQ(val[11], 0x0);
+  EXPECT_EQ(val[12], 0x0);
+  EXPECT_EQ(val[13], 0x1C);
+  EXPECT_EQ(val[14], 0xC0);
+
+  std::remove(filename.c_str());
 }
-#endif
 
 int main(int argc, char *argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
