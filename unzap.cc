@@ -10,8 +10,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Create variables and open files
-  Huffman decompressor;
+  // Open files
   std::ifstream ifs(argv[1], std::ios::in | std::ios::binary);
   if (!ifs.is_open()) {
     std::cerr << "Error: cannot open zap file " << argv[1] << '\n';
@@ -26,7 +25,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Decompress
-  decompressor.Decompress(ifs, ofs);
+  Huffman::Decompress(ifs, ofs);
 
   std::cout << "Decompressed zap file " << argv[1] << " into output file "
             << argv[2] << '\n';

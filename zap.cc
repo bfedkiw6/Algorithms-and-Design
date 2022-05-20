@@ -10,8 +10,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Create variables and open files
-  Huffman compressor;
+  // Open files
   std::ifstream ifs(argv[1]);
   if (!ifs.is_open()) {
     std::cerr << "Error: cannot open input file " << argv[1] << '\n';
@@ -26,7 +25,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Compress
-  compressor.Compress(ifs, ofs);
+  Huffman::Compress(ifs, ofs);
 
   std::cout << "Compressed input file " << argv[1] << " into zap file "
             << argv[2] << '\n';
