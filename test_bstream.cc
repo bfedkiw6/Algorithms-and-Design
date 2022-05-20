@@ -131,6 +131,25 @@ TEST(BStream, OutputAndInputByBits) {
   std::remove(filename.c_str());
 }
 
+TEST(BStream, InputError) {
+  std::string filename{"test_inputerror"};
+
+  // Create empty file
+  std::ofstream ofs(filename,
+                    std::ios::out | std::ios::trunc | std::ios::binary);
+  ofs.close();
+
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary);
+  BinaryInputStream bis(ifs);
+
+  EXPECT_THROW(bis.GetBit(), std::exception);
+  EXPECT_THROW(bis.GetChar(), std::exception);
+  EXPECT_THROW(bis.GetInt(), std::exception);
+
+  ifs.close();
+  std::remove(filename.c_str());
+}
+
 TEST(BStream, OutputIrregularly) {
   std::string filename{"test_output_irregularly"};
 
@@ -191,6 +210,56 @@ TEST(BStream, OutputIrregularly) {
   EXPECT_EQ(val[13], 0x1C);
   EXPECT_EQ(val[14], 0xC0);
 
+  std::remove(filename.c_str());
+}
+
+TEST(BStream, InputIrregularly) {
+  std::string filename{"test_input_irregularly"};
+  const unsigned char val[] = {0x48, 0x82, 0x59, 0x16, 0xD5, 0xD2, 0x0, 0x95,
+                               0x3D, 0xA0, 0x0,  0x0,  0x0,  0x1C, 0xC0};
+
+  // Write data to file
+  std::ofstream ofs(filename,
+                    std::ios::out | std::ios::trunc | std::ios::binary);
+  ofs.write(reinterpret_cast<const char *>(val), sizeof(val));
+  ofs.close();
+
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary);
+  BinaryInputStream bis(ifs);
+
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetChar(), 'D');
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetChar(), 'K');
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetChar(), 'E');
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetChar(), 'W');
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetInt(), 4890320);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetInt(), 28);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 1);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_THROW(bis.GetBit(), std::exception);
+
+  ifs.close();
   std::remove(filename.c_str());
 }
 
