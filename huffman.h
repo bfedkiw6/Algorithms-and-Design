@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <queue>
 #include <sstream>
 #include <streambuf>
@@ -65,13 +66,13 @@ class Huffman {
                              std::array<int, 128> &freq_array);
   static void BuildHuffmanTree(
       std::array<int, 128> &freq_array,
-      PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree);
+      PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> &huffman_tree);
   static void Encoding(HuffmanNode *node,
                        std::array<std::string, 128> &code_table,
                        std::string path, std::string &encoded_string);
   // Decompress Helpers
-  static HuffmanNode *MakeNode(BinaryInputStream &bis);
-  static HuffmanNode *RebuildTree(BinaryInputStream &bis);
+  static std::unique_ptr<HuffmanNode> MakeNode(BinaryInputStream &bis);
+  static std::unique_ptr<HuffmanNode> RebuildTree(BinaryInputStream &bis);
   static void WriteEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
                                  HuffmanNode *huffman_tree);
 };
@@ -85,26 +86,27 @@ void Huffman::CountFrequency(std::string &file_contents,
 
 void Huffman::BuildHuffmanTree(
     std::array<int, 128> &freq_array,
-    PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree) {
+    PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> &huffman_tree) {
   // Add Nodes
   for (int i = 0; i < 128; i++) {
     if (!freq_array[i])
       continue;
 
-    huffman_tree.Push(new HuffmanNode(static_cast<char>(i), freq_array[i]));
+    huffman_tree.Push(std::unique_ptr<HuffmanNode>(
+        new HuffmanNode(static_cast<char>(i), freq_array[i])));
   }
 
   // Tree building algorithm
-  HuffmanNode *node1, *node2;
+  std::unique_ptr<HuffmanNode> node1, node2;
   while (huffman_tree.Size() != 1) {
     // Pop top 2 nodes
-    node1 = huffman_tree.Top();
+    std::swap(node1, huffman_tree.Top());
     huffman_tree.Pop();
-    node2 = huffman_tree.Top();
+    std::swap(node2, huffman_tree.Top());
     huffman_tree.Pop();
 
-    huffman_tree.Push(
-        new HuffmanNode(0, node1->freq() + node2->freq(), node1, node2));
+    huffman_tree.Push(std::unique_ptr<HuffmanNode>(new HuffmanNode(
+        0, node1->freq() + node2->freq(), node1.get(), node2.get())));
   }
   assert(huffman_tree.Size() == 1);
 }
@@ -123,27 +125,27 @@ void Huffman::Encoding(HuffmanNode *node,
     if (node->right())
       Encoding(node->right(), code_table, path + '1', encoded_string);
   }
-
-  delete node;
 }
 
-HuffmanNode *Huffman::MakeNode(BinaryInputStream &bis) {
+std::unique_ptr<HuffmanNode> HuffmanNode::MakeNode(BinaryInputStream &bis) {
   bool cur_bit = bis.GetBit();
   if (cur_bit)
     // Character node
-    return new HuffmanNode(bis.GetChar(), 0);
+    return std::unique_ptr<HuffmanNode>(new HuffmanNode(bis.GetChar(), 0));
   else
     // Internal node with next two nodes as its left and right children
-    return new HuffmanNode(0, 0, MakeNode(bis), MakeNode(bis));
+    return std::unique_ptr<HuffmanNode>(
+        new HuffmanNode(0, 0, MakeNode(bis), MakeNode(bis)));
 }
 
-HuffmanNode *Huffman::RebuildTree(BinaryInputStream &bis) {
+std::unique_ptr<HuffmanNode> Huffman::RebuildTree(BinaryInputStream &bis) {
   if (bis.GetBit())
     // If only one unique character, no internal node
-    return new HuffmanNode(bis.GetChar(), 0);
+    return std::unique_ptr<HuffmanNode>(new HuffmanNode(bis.GetChar(), 0));
   else
     // Root will always be internal node otherwise
-    return new HuffmanNode(0, 0, MakeNode(bis), MakeNode(bis));
+    return std::unique_ptr<HuffmanNode>(
+        new HuffmanNode(0, 0, MakeNode(bis).get(), MakeNode(bis).get()));
 }
 
 void Huffman::WriteEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
@@ -168,7 +170,7 @@ void Huffman::WriteEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
 void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   std::string file_contents;
   std::array<int, 128> freq_array = {0};
-  PQueue<HuffmanNode *, CompareHuffmanNodes> huffman_tree;
+  PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> huffman_tree;
   std::string encoded_tree;
   std::array<std::string, 128> code_table = {""};
 
@@ -178,7 +180,7 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   // Gather necessary data
   CountFrequency(file_contents, freq_array);
   BuildHuffmanTree(freq_array, huffman_tree);
-  Encoding(huffman_tree.Top(), code_table, "", encoded_tree);
+  Encoding(huffman_tree.Top().get(), code_table, "", encoded_tree);
 
   // Write to file (not in a function to not have to pass so many parameters)
   BinaryOutputStream bos(ofs);
