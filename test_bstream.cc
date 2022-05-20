@@ -158,7 +158,6 @@ TEST(BStream, OutputIrregularly) {
                     std::ios::out | std::ios::trunc | std::ios::binary);
   BinaryOutputStream bos(ofs);
 
-  // 4 chars, 2 ints, 18 bits
   bos.PutBit(0);
   bos.PutBit(1);
   bos.PutBit(0);

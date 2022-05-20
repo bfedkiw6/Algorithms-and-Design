@@ -176,14 +176,14 @@ class MyClass {
   int n_;
 };
 
-class CompareMyClass {
+class CompareMyClassLess {
  public:
   bool operator()(MyClass* kObj1, MyClass* kObj2) {
     return kObj1->n() < kObj2->n();
   }
 };
 
-class CompareMyClass2 {
+class CompareMyClassGreater {
  public:
   bool operator()(MyClass* kObj1, MyClass* kObj2) {
     return kObj1->n() > kObj2->n();
@@ -205,11 +205,11 @@ TEST(PQueue, custom_class) {
   EXPECT_EQ(pq.Top().n(), vec[1].n());
 }
 
-TEST(PQueue, custom_class_pointer) {
+TEST(PQueue, custom_class_pointer_less) {
   std::vector<MyClass*> vec{new MyClass(42), new MyClass(23), new MyClass(2),
                             new MyClass(34)};
 
-  PQueue<MyClass*, CompareMyClass> pq;
+  PQueue<MyClass*, CompareMyClassLess> pq;
   pq.Push(vec[0]);
   pq.Push(vec[1]);
   pq.Push(vec[2]);
@@ -227,11 +227,11 @@ TEST(PQueue, custom_class_pointer) {
   }
 }
 
-TEST(PQueue, custom_class_pointer2) {
+TEST(PQueue, custom_class_pointer_greater) {
   std::vector<MyClass*> vec{new MyClass(42), new MyClass(23), new MyClass(2),
                             new MyClass(34)};
 
-  PQueue<MyClass*, CompareMyClass2> pq;
+  PQueue<MyClass*, CompareMyClassGreater> pq;
   pq.Push(vec[0]);
   pq.Push(vec[1]);
   pq.Push(vec[2]);
