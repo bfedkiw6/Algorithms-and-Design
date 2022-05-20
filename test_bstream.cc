@@ -11,54 +11,52 @@ TEST(BStream, outputbybits) {
 }
 #endif
 
-TEST(BStream, outputbitandchars) {
-  std::string filename{"test_bstream_outputbitandchars"};
+TEST(BStream, OutputMiscellaneous) {
+  std::string filename{"test_bstream_outputmiscellaneous"};
 
   // Write data to file
   std::ofstream ofs(filename,
                     std::ios::out | std::ios::trunc | std::ios::binary);
   BinaryOutputStream bos(ofs);
 
-  // Write ascii for 'I' 01001001
+  // Write ascii for 'B' 01000010
   bos.PutBit(0);
   bos.PutBit(1);
   bos.PutBit(0);
   bos.PutBit(0);
-  bos.PutBit(1);
   bos.PutBit(0);
   bos.PutBit(0);
   bos.PutBit(1);
+  bos.PutBit(0);
 
   // Write a few chars and ints
-  bos.PutChar(' ');
-  bos.PutChar('l');
   bos.PutChar('o');
-  bos.PutChar('v');
-  bos.PutChar('e');
-  bos.PutChar(' ');
-  bos.PutChar('E');
-  bos.PutChar('C');
-  bos.PutChar('S');
-  bos.PutChar('3');
-  bos.PutChar('6');
-  bos.PutChar('C');
+  bos.PutChar('o');
   bos.PutChar('!');
-  bos.PutInt(54);
+  bos.PutInt(4890320);
   bos.PutInt(28);
 
+  bos.Close();
   ofs.close();
 
   std::ifstream ifs(filename, std::ios::in | std::ios::binary);
-  std::string input;
-  ifs.read((char *)&input, sizeof(char) * 14);
-  int i1, i2;
-  ifs.read((char *)&i1, sizeof(int));
-  ifs.read((char *)&i2, sizeof(int));
-
-  EXPECT_EQ(input, "I love ECS36C!");
-  EXPECT_EQ(i1, 54);
-  EXPECT_EQ(i1, 28);
+  unsigned char val[12];
+  ifs.read(reinterpret_cast<char *>(val), sizeof(val));
   ifs.close();
+
+  EXPECT_EQ(val[0], 0x42);
+  EXPECT_EQ(val[1], 0x6F);
+  EXPECT_EQ(val[2], 0x6F);
+  EXPECT_EQ(val[3], 0x21);
+  EXPECT_EQ(val[4], 0x0);
+  EXPECT_EQ(val[5], 0x4A);
+  EXPECT_EQ(val[6], 0x9E);
+  EXPECT_EQ(val[7], 0xD0);
+  EXPECT_EQ(val[8], 0x0);
+  EXPECT_EQ(val[9], 0x0);
+  EXPECT_EQ(val[10], 0x0);
+  EXPECT_EQ(val[11], 0x1C);
+
   std::remove(filename.c_str());
 }
 
@@ -95,7 +93,7 @@ TEST(BStream, inputbybits) {
 }
 
 TEST(BStream, writeandread) {
-  std::string filename{"test_bstream_charsandints"};
+  std::string filename{"test_bstream_writeandread"};
 
   // Write data to file
   std::ofstream ofs(filename,
@@ -107,10 +105,16 @@ TEST(BStream, writeandread) {
   bos.PutChar('e');
   bos.PutChar('y');
   bos.PutChar('!');
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutBit(1);
   bos.PutInt(2);
   bos.PutInt(37);
   bos.PutInt(47);
 
+  bos.Close();
   ofs.close();
 
   std::ifstream ifs(filename, std::ios::in | std::ios::binary);
@@ -120,9 +124,14 @@ TEST(BStream, writeandread) {
   EXPECT_EQ(bis.GetChar(), 0x65);
   EXPECT_EQ(bis.GetChar(), 0x79);
   EXPECT_EQ(bis.GetChar(), 0x21);
-  EXPECT_EQ(bis.GetInt(), 0x32);
-  EXPECT_EQ(bis.GetInt(), 0x3337);
-  EXPECT_EQ(bis.GetInt(), 0x3437);
+  EXPECT_EQ(bis.GetBit(), 0x0);
+  EXPECT_EQ(bis.GetBit(), 0x1);
+  EXPECT_EQ(bis.GetBit(), 0x0);
+  EXPECT_EQ(bis.GetBit(), 0x1);
+  EXPECT_EQ(bis.GetBit(), 0x1);
+  EXPECT_EQ(bis.GetInt(), 0x2);
+  EXPECT_EQ(bis.GetInt(), 0x25);
+  EXPECT_EQ(bis.GetInt(), 0x2F);
   ifs.close();
 
   std::remove(filename.c_str());
