@@ -67,6 +67,7 @@ int BinaryInputStream::GetInt() {
   // To be completed
   int read_int = 0x0;
 
+  // Gets the int byte by byte
   for (size_t i = 0; i < sizeof(int); i++)
     // Need to mask the bits to the left of the char
     read_int = read_int << CHAR_BIT | (GetChar() & 0xFF);
@@ -140,8 +141,9 @@ void BinaryOutputStream::PutChar(char byte) {
 
 void BinaryOutputStream::PutInt(int word) {
   // To be completed
+  // Puts the int byte by byte
   for (int i = sizeof(int) - 1; i >= 0; i--) {
-    // Mask the char so the bits to the left of the char are 0
+    // Need to mask the bits to the left of the char
     char byte = word >> (CHAR_BIT * i) & 0xFF;
     PutChar(byte);
   }

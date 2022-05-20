@@ -339,6 +339,72 @@ TEST(BStream, OutputAndInputIrregularlySameOrder) {
   std::remove(filename.c_str());
 }
 
+TEST(BStream, BigInts) {
+  std::string filename{"test_big_ints"};
+  // Write data to file
+  std::ofstream ofs(filename,
+                    std::ios::out | std::ios::trunc | std::ios::binary);
+  BinaryOutputStream bos(ofs);
+
+  bos.PutInt(584390);
+  bos.PutInt(-3458902);
+  bos.PutInt(20943854);
+  bos.PutInt(584399832);
+  bos.PutInt(-9835315);
+
+  bos.Close();
+  ofs.close();
+
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary);
+  BinaryInputStream bis(ifs);
+
+  EXPECT_EQ(bis.GetInt(), 584390);
+  EXPECT_EQ(bis.GetInt(), -3458902);
+  EXPECT_EQ(bis.GetInt(), 20943854);
+  EXPECT_EQ(bis.GetInt(), 584399832);
+  EXPECT_EQ(bis.GetInt(), -9835315);
+
+  ifs.close();
+  std::remove(filename.c_str());
+}
+
+TEST(BStream, OutputAndInputIrregularlyDifferentOrder) {
+  std::string filename{"test_output_and_input_irregularly_different_order"};
+
+  // Write data to file
+  std::ofstream ofs(filename,
+                    std::ios::out | std::ios::trunc | std::ios::binary);
+  BinaryOutputStream bos(ofs);
+
+  // 01010001 00100000 00000000 00000000 00000011 10001001 01100000
+  bos.PutBit(0);
+  bos.PutBit(1);
+  bos.PutChar('D');
+  bos.PutBit(1);
+  bos.PutInt(28);
+  bos.PutChar('K');
+
+  bos.Close();
+  ofs.close();
+
+  std::ifstream ifs(filename, std::ios::in | std::ios::binary);
+  BinaryInputStream bis(ifs);
+
+  EXPECT_EQ(bis.GetChar(), 0x51);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetChar(), 0x40);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_EQ(bis.GetInt(), 0x1C4B);
+  EXPECT_EQ(bis.GetBit(), 0);
+  EXPECT_THROW(bis.GetChar(), std::exception);
+  EXPECT_THROW(bis.GetInt(), std::exception);
+  EXPECT_THROW(bis.GetBit(), std::exception);
+
+  ifs.close();
+  std::remove(filename.c_str());
+}
+
 int main(int argc, char *argv[]) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
