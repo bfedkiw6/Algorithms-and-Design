@@ -11,6 +11,7 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
+#include <utility>
 
 #include "bstream.h"
 #include "pqueue.h"
@@ -58,7 +59,8 @@ class Huffman {
   // Compares HuffmanNode pointers
   class CompareHuffmanNodes {
    public:
-    bool operator()(HuffmanNode *node1, HuffmanNode *node2) {
+    bool operator()(std::unique_ptr<HuffmanNode> &node1,
+                    std::unique_ptr<HuffmanNode> &node2) {
       return *node1 < *node2;
     }
   };
@@ -86,14 +88,15 @@ void Huffman::CountFrequency(std::string &file_contents,
 
 void Huffman::BuildHuffmanTree(
     std::array<int, 128> &freq_array,
-    PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> &huffman_tree) {
+    PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree) {
   // Add Nodes
   for (int i = 0; i < 128; i++) {
     if (!freq_array[i])
       continue;
 
-    huffman_tree.Push(std::unique_ptr<HuffmanNode>(
-        new HuffmanNode(static_cast<char>(i), freq_array[i])));
+    std::unique_ptr<HuffmanNode> node(
+        new HuffmanNode(static_cast<char>(i), freq_array[i]));
+    huffman_tree.Push(node.get());
   }
 
   // Tree building algorithm
@@ -105,8 +108,9 @@ void Huffman::BuildHuffmanTree(
     std::swap(node2, huffman_tree.Top());
     huffman_tree.Pop();
 
-    huffman_tree.Push(std::unique_ptr<HuffmanNode>(new HuffmanNode(
+    std::unique_ptr<HuffmanNode> internal_node((new HuffmanNode(
         0, node1->freq() + node2->freq(), node1.get(), node2.get())));
+    huffman_tree.Push(internal_node.get());
   }
   assert(huffman_tree.Size() == 1);
 }
@@ -127,7 +131,7 @@ void Huffman::Encoding(HuffmanNode *node,
   }
 }
 
-std::unique_ptr<HuffmanNode> HuffmanNode::MakeNode(BinaryInputStream &bis) {
+std::unique_ptr<HuffmanNode> Huffman::MakeNode(BinaryInputStream &bis) {
   bool cur_bit = bis.GetBit();
   if (cur_bit)
     // Character node
@@ -135,7 +139,7 @@ std::unique_ptr<HuffmanNode> HuffmanNode::MakeNode(BinaryInputStream &bis) {
   else
     // Internal node with next two nodes as its left and right children
     return std::unique_ptr<HuffmanNode>(
-        new HuffmanNode(0, 0, MakeNode(bis), MakeNode(bis)));
+        new HuffmanNode(0, 0, MakeNode(bis).get(), MakeNode(bis).get()));
 }
 
 std::unique_ptr<HuffmanNode> Huffman::RebuildTree(BinaryInputStream &bis) {
@@ -214,24 +218,9 @@ void Huffman::Decompress(std::ifstream &ifs, std::ofstream &ofs) {
   BinaryInputStream bis(ifs);
 
   // Rebuild tree
-  HuffmanNode *huffman_tree = RebuildTree(bis);
+  std::unique_ptr<HuffmanNode> huffman_tree = RebuildTree(bis);
   // Write to file
-  WriteEncodedString(bis, ofs, huffman_tree);
-
-  // Delete huffman tree
-  std::queue<HuffmanNode *> deletion_queue;
-  deletion_queue.push(huffman_tree);
-
-  while (!deletion_queue.empty()) {
-    HuffmanNode *cur_node = deletion_queue.front();
-    if (cur_node->left())
-      deletion_queue.push(cur_node->left());
-    if (cur_node->right())
-      deletion_queue.push(cur_node->right());
-
-    delete cur_node;
-    deletion_queue.pop();
-  }
+  WriteEncodedString(bis, ofs, huffman_tree.get());
 }
 
 #endif  // HUFFMAN_H_
