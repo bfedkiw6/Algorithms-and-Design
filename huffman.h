@@ -18,9 +18,13 @@
 
 class HuffmanNode {
  public:
-  explicit HuffmanNode(char ch, size_t freq, HuffmanNode *left = nullptr,
-                       HuffmanNode *right = nullptr)
-      : ch_(ch), freq_(freq), left_(left), right_(right) {}
+  explicit HuffmanNode(char ch, size_t freq,
+                       std::unique_ptr<HuffmanNode> left = nullptr,
+                       std::unique_ptr<HuffmanNode> right = nullptr)
+      : ch_(ch), freq_(freq) {
+    left_ = std::move(left);
+    right_ = std::move(right);
+  }
 
   bool IsLeaf() {
     // Node is a leaf if it doesn't have any children
@@ -37,13 +41,13 @@ class HuffmanNode {
 
   size_t freq() { return freq_; }
   size_t data() { return ch_; }
-  HuffmanNode *left() { return left_; }
-  HuffmanNode *right() { return right_; }
+  HuffmanNode *left() { return left_.get(); }
+  HuffmanNode *right() { return right_.get(); }
 
  private:
   char ch_;
   size_t freq_;
-  HuffmanNode *left_, *right_;
+  std::unique_ptr<HuffmanNode> left_, right_;
 };
 
 class Huffman {
@@ -88,15 +92,15 @@ void Huffman::CountFrequency(std::string &file_contents,
 
 void Huffman::BuildHuffmanTree(
     std::array<int, 128> &freq_array,
-    PQueue<HuffmanNode *, CompareHuffmanNodes> &huffman_tree) {
+    PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> &huffman_tree) {
   // Add Nodes
   for (int i = 0; i < 128; i++) {
     if (!freq_array[i])
       continue;
 
-    std::unique_ptr<HuffmanNode> node(
-        new HuffmanNode(static_cast<char>(i), freq_array[i]));
-    huffman_tree.Push(node.get());
+    std::unique_ptr<HuffmanNode> node(std::unique_ptr<HuffmanNode>(
+        new HuffmanNode(static_cast<char>(i), freq_array[i])));
+    huffman_tree.Push(std::move(node));
   }
 
   // Tree building algorithm
@@ -108,9 +112,9 @@ void Huffman::BuildHuffmanTree(
     std::swap(node2, huffman_tree.Top());
     huffman_tree.Pop();
 
-    std::unique_ptr<HuffmanNode> internal_node((new HuffmanNode(
-        0, node1->freq() + node2->freq(), node1.get(), node2.get())));
-    huffman_tree.Push(internal_node.get());
+    std::unique_ptr<HuffmanNode> internal_node(new HuffmanNode(
+        0, node1->freq() + node2->freq(), std::move(node1), std::move(node2)));
+    huffman_tree.Push(std::move(internal_node));
   }
   assert(huffman_tree.Size() == 1);
 }
@@ -139,7 +143,7 @@ std::unique_ptr<HuffmanNode> Huffman::MakeNode(BinaryInputStream &bis) {
   else
     // Internal node with next two nodes as its left and right children
     return std::unique_ptr<HuffmanNode>(
-        new HuffmanNode(0, 0, MakeNode(bis).get(), MakeNode(bis).get()));
+        new HuffmanNode(0, 0, MakeNode(bis), MakeNode(bis)));
 }
 
 std::unique_ptr<HuffmanNode> Huffman::RebuildTree(BinaryInputStream &bis) {
@@ -149,7 +153,7 @@ std::unique_ptr<HuffmanNode> Huffman::RebuildTree(BinaryInputStream &bis) {
   else
     // Root will always be internal node otherwise
     return std::unique_ptr<HuffmanNode>(
-        new HuffmanNode(0, 0, MakeNode(bis).get(), MakeNode(bis).get()));
+        new HuffmanNode(0, 0, MakeNode(bis), MakeNode(bis)));
 }
 
 void Huffman::WriteEncodedString(BinaryInputStream &bis, std::ofstream &ofs,

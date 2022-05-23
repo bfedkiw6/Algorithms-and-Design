@@ -19,7 +19,7 @@ class PQueue {
   // Remove top of priority queue
   void Pop();
   // Insert item and sort priority queue
-  void Push(const T& item);
+  void Push(T item);
 
  private:
   std::vector<T> items;
@@ -71,7 +71,7 @@ void PQueue<T, C>::Pop() {
 
 // From Professor's Binary Heap Code, altered for automatic resizing
 template <typename T, typename C>
-void PQueue<T, C>::Push(const T& item) {
+void PQueue<T, C>::Push(T item) {
   // Insert at the end
   items.push_back(std::move(item));
   cur_size++;
