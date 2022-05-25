@@ -99,7 +99,7 @@ std::unique_ptr<HuffmanNode> Huffman::BuildHuffmanTree(
 
     std::unique_ptr<HuffmanNode> node(std::unique_ptr<HuffmanNode>(
         new HuffmanNode(static_cast<char>(i), freq_array[i])));
-    huffman_tree.Push(std::move(node));
+    huffman_tree.Push<HuffmanNode>(std::move(node));
   }
 
   // Tree building algorithm
@@ -113,7 +113,7 @@ std::unique_ptr<HuffmanNode> Huffman::BuildHuffmanTree(
 
     std::unique_ptr<HuffmanNode> internal_node(new HuffmanNode(
         0, node1->freq() + node2->freq(), std::move(node1), std::move(node2)));
-    huffman_tree.Push(std::move(internal_node));
+    huffman_tree.Push<HuffmanNode>(std::move(internal_node));
   }
   assert(huffman_tree.Size() == 1);
 
