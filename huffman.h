@@ -70,9 +70,8 @@ class Huffman {
   };
   static void CountFrequency(std::string &file_contents,
                              std::array<int, 128> &freq_array);
-  static void BuildHuffmanTree(
-      std::array<int, 128> &freq_array,
-      PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> &huffman_tree);
+  static std::unique_ptr<HuffmanNode> BuildHuffmanTree(
+      std::array<int, 128> &freq_array);
   static void Encoding(HuffmanNode *node,
                        std::array<std::string, 128> &code_table,
                        std::string path, std::string &encoded_string);
@@ -90,9 +89,9 @@ void Huffman::CountFrequency(std::string &file_contents,
     freq_array[file_contents[i]]++;
 }
 
-void Huffman::BuildHuffmanTree(
-    std::array<int, 128> &freq_array,
-    PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> &huffman_tree) {
+std::unique_ptr<HuffmanNode> Huffman::BuildHuffmanTree(
+    std::array<int, 128> &freq_array) {
+  PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> huffman_tree;
   // Add Nodes
   for (int i = 0; i < 128; i++) {
     if (!freq_array[i])
@@ -117,6 +116,8 @@ void Huffman::BuildHuffmanTree(
     huffman_tree.Push(std::move(internal_node));
   }
   assert(huffman_tree.Size() == 1);
+
+  return std::move(huffman_tree.Top());
 }
 
 void Huffman::Encoding(HuffmanNode *node,
@@ -178,7 +179,6 @@ void Huffman::WriteEncodedString(BinaryInputStream &bis, std::ofstream &ofs,
 void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
   std::string file_contents;
   std::array<int, 128> freq_array = {0};
-  PQueue<std::unique_ptr<HuffmanNode>, CompareHuffmanNodes> huffman_tree;
   std::string encoded_tree;
   std::array<std::string, 128> code_table = {""};
 
@@ -187,8 +187,8 @@ void Huffman::Compress(std::ifstream &ifs, std::ofstream &ofs) {
                               std::istreambuf_iterator<char>());
   // Gather necessary data
   CountFrequency(file_contents, freq_array);
-  BuildHuffmanTree(freq_array, huffman_tree);
-  Encoding(huffman_tree.Top().get(), code_table, "", encoded_tree);
+  std::unique_ptr<HuffmanNode> huffman_tree = BuildHuffmanTree(freq_array);
+  Encoding(huffman_tree.get(), code_table, "", encoded_tree);
 
   // Write to file (not in a function to not have to pass so many parameters)
   BinaryOutputStream bos(ofs);
